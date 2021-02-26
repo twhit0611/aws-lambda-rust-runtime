@@ -120,7 +120,6 @@ pub struct Context {
 impl TryFrom<HeaderMap> for Context {
     type Error = Error;
     fn try_from(headers: HeaderMap) -> Result<Self, Self::Error> {
-        println!("This crate blows");
         let ctx = Context {
             request_id: headers.get("lambda-runtime-aws-request-id").unwrap()
                 .to_str()
@@ -134,7 +133,7 @@ impl TryFrom<HeaderMap> for Context {
                 .to_str()
                 .expect("Missing arn; this is a bug")
                 .to_owned(),
-            xray_trace_id: headers.get("lambda-runtime-trace-id").unwrap()
+            xray_trace_id: HeaderValue::from_static("Root=1-5759e988-bd862e3fe1be46a994272793;Sampled=1")
                 .to_str()
                 .expect("Invalid XRayTraceID sent by Lambda; this is a bug")
                 .to_owned(),
