@@ -120,6 +120,7 @@ pub struct Context {
 impl TryFrom<HeaderMap> for Context {
     type Error = Error;
     fn try_from(headers: HeaderMap) -> Result<Self, Self::Error> {
+        println!("This crate blows");
         let ctx = Context {
             request_id: headers.get("lambda-runtime-aws-request-id").unwrap()
                 .to_str()
