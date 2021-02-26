@@ -119,23 +119,21 @@ pub struct Context {
 
 impl TryFrom<HeaderMap> for Context {
     type Error = Error;
-    fn try_from(mut headers: HeaderMap) -> Result<Self, Self::Error> {
-        let default_header = HeaderValue::from_static("arn:this_is_a_mock_value:12345");
-        headers.append("lambda-runtime-invoked-function-arn", default_header.clone());
+    fn try_from(headers: HeaderMap) -> Result<Self, Self::Error> {
         let ctx = Context {
-            request_id: headers.get("lambda-runtime-aws-request-id").unwrap_or(&default_header)
+            request_id: headers.get("lambda-runtime-aws-request-id").unwrap()
                 .to_str()
                 .expect("Missing Request ID")
                 .to_owned(),
-            deadline: headers.get("lambda-runtime-deadline-ms").unwrap_or(&default_header)
+            deadline: headers.get("lambda-runtime-deadline-ms").unwrap()
                 .to_str()?
                 .parse()
                 .expect("Missing deadline"),
-            invoked_function_arn: headers.get("lambda-runtime-invoked-function-arn").unwrap_or(&default_header)
+            invoked_function_arn: HeaderValue::from_static("arn:this_is_so_stupid:8675309")
                 .to_str()
                 .expect("Missing arn; this is a bug")
                 .to_owned(),
-            xray_trace_id: headers.get("lambda-runtime-trace-id").unwrap_or(&default_header)
+            xray_trace_id: headers.get("lambda-runtime-trace-id").unwrap()
                 .to_str()
                 .expect("Invalid XRayTraceID sent by Lambda; this is a bug")
                 .to_owned(),
