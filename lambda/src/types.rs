@@ -1,5 +1,6 @@
 use crate::{Config, Error};
-use http::HeaderMap;
+use bytes::Bytes;
+use http::{HeaderMap, HeaderValue};
 use serde::{Deserialize, Serialize};
 use std::{collections::HashMap, convert::TryFrom};
 
@@ -119,20 +120,21 @@ pub struct Context {
 impl TryFrom<HeaderMap> for Context {
     type Error = Error;
     fn try_from(headers: HeaderMap) -> Result<Self, Self::Error> {
+        let default_header = HeaderValue::from_static("");
         let ctx = Context {
-            request_id: headers["lambda-runtime-aws-request-id"]
+            request_id: headers.get("lambda-runtime-aws-request-id").unwrap_or(&default_header)
                 .to_str()
                 .expect("Missing Request ID")
                 .to_owned(),
-            deadline: headers["lambda-runtime-deadline-ms"]
+            deadline: headers.get("lambda-runtime-deadline-ms").unwrap_or(&default_header)
                 .to_str()?
                 .parse()
                 .expect("Missing deadline"),
-            invoked_function_arn: headers["lambda-runtime-invoked-function-arn"]
+            invoked_function_arn: headers.get("lambda-runtime-invoked-function-arn").unwrap_or(&default_header)
                 .to_str()
                 .expect("Missing arn; this is a bug")
                 .to_owned(),
-            xray_trace_id: headers["lambda-runtime-trace-id"]
+            xray_trace_id: headers.get("lambda-runtime-trace-id").unwrap_or(&default_header)
                 .to_str()
                 .expect("Invalid XRayTraceID sent by Lambda; this is a bug")
                 .to_owned(),
