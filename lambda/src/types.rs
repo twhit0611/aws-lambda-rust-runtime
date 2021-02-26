@@ -119,8 +119,9 @@ pub struct Context {
 
 impl TryFrom<HeaderMap> for Context {
     type Error = Error;
-    fn try_from(headers: HeaderMap) -> Result<Self, Self::Error> {
+    fn try_from(mut headers: HeaderMap) -> Result<Self, Self::Error> {
         let default_header = HeaderValue::from_static("");
+        headers.append("lambda-runtime-invoked-function-arn", default_header.clone());
         let ctx = Context {
             request_id: headers.get("lambda-runtime-aws-request-id").unwrap_or(&default_header)
                 .to_str()
